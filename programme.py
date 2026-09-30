@@ -18,6 +18,14 @@ class Session:
 
 @dataclass
 class Node:
-    duration: Duration
-    session: Session
+    session: Session | None
     node: Node | None
+
+# calender[0] = januari 2026
+# calender[119] = december 2035
+
+node = Node(None, None)
+calender = list([node] * 120)
+
+
+print(calender)
