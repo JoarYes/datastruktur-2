@@ -1,0 +1,1 @@
+Använt för att hitta ett fel i koden då alla calender index var desamma fast funktionen borde ha sett till att dom var olika
