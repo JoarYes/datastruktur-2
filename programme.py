@@ -27,14 +27,54 @@ class Node:
 node = Node(None, None)
 calender = [Node(None, None) for _ in range(120)]
 
-def addMonthDateNodes(c, day, days):
-    if day == days-1: 
+def addMonthDateNodes(c, day, amount):
+    if day == amount-1: 
         c = Node(None, None)
         return c
     else:
         day += 1
-        c.node = Node(None, addMonthDateNodes(c, day, days))
+        c.node = Node(None, addMonthDateNodes(c, day, amount))
         return c.node
+
+def searchNode(target, prevNode):
+    if prevNode.session == None:
+        return "NaN"
+    if target <= prevNode.session.Date.day:
+        return prevNode
+    else:
+        try:
+            node = searchNode(target, prevNode.node)
+        except:
+            return None
+
+    return node
+
+# Insert session into correct spot
+def addNode(aSession, prevNode):
+    pointer = prevNode.node
+
+    if prevNode.session == None:
+        prevNode.session = aSession
+        return None
+
+    if prevNode.node == None:
+        prevNode.node = Node(aSession, pointer)
+        return None
+    
+    # Compares session day with current and next node
+    if aSession.Date.day >= prevNode.session.Date.day:
+        if aSession.Date.day < prevNode.node.session.Date.day:
+            prevNode.node = Node(aSession, pointer)
+            return None
+        else:
+            node = addNode(aSession, prevNode.node)
+    else:
+        try:
+            node = addNode(aSession, prevNode.node)
+        except:
+            return None
+
+    return node
 
 offset = 0
 augustCheck = False
@@ -88,7 +128,7 @@ while True:
             # Calculate proper index
             index = (dateInput.year - startYear) * 12 + (dateInput.month - startMonth)
 
-            
-            #calender[index] = newSession
-            print(index)
+            addNode(newSession, calender[index])
+
+            print(calender[index])
             break
