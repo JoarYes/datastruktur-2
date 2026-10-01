@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import datetime, date
 
 
 @dataclass
@@ -44,5 +44,37 @@ for i in range(120):
 
     calender[i] = Node(None, None)
 
+# User inputs
+while True:
 
-print(calender)
+    print("What do you want to do?")
+    print("Add session (a), Delete session (d), List sessions (l)")
+
+    usrInput = input("Command: ")
+
+    if usrInput == "a":
+        while True:
+            try:
+                dateInput = datetime.strptime(input("What date(DD.MM.YYYY): "),"%d.%m.%Y").date()
+            except:
+                print("Invalid input!")
+                continue
+
+            descriptionInput = input("Description: ")
+
+            try:
+                lengthInput = float(input("Length ran(km.m): "))
+            except:
+                print("Invalid input!\nTry again!\n")
+                continue
+            
+            durationInput = input("Duration(H.M.S): ").split(".")
+            try:
+                duration = Duration(durationInput[0], durationInput[1], durationInput[2])
+            except:
+                print("Invalid input!")
+                continue
+
+            newSession = Session(dateInput, descriptionInput, lengthInput, duration)
+            print(newSession)
+            break
