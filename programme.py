@@ -37,24 +37,12 @@ def addMonthDateNodes(c, day, days):
         return c.node
 
 offset = 0
+augustCheck = False
 yearCheck = False
 
 for i in range(120):
 
-    print(i)
-    if i > 8 and yearCheck == False:
-        offset -= 1
-        yearCheck = True
-    
-    if (i - offset) % 2 == 0:
-        calender[i].node = addMonthDateNodes(calender[i], 1, 31)
-        print("hello")
-    elif (i - offset) % 2 != 0:
-        calender[i].node = addMonthDateNodes(calender[i], 1, 30)
-        print("goodbay")
-
-    if i % 12 == 0:
-        yearCheck = False
+    calender[i] = Node(None, None)
 
 
 print(calender)
