@@ -52,12 +52,17 @@ while True:
 
     usrInput = input("Command: ")
 
+    # Add session
     if usrInput == "a":
         while True:
             try:
                 dateInput = datetime.strptime(input("What date(DD.MM.YYYY): "),"%d.%m.%Y").date()
             except:
                 print("Invalid input!")
+                continue
+
+            if dateInput.year > 2035 or dateInput.year < 2026:
+                print("Year must be between 2026 and 2035!")
                 continue
 
             descriptionInput = input("Description: ")
@@ -76,5 +81,14 @@ while True:
                 continue
 
             newSession = Session(dateInput, descriptionInput, lengthInput, duration)
-            print(newSession)
+
+            startYear = 2026
+            startMonth = 1
+
+            # Calculate proper index
+            index = (dateInput.year - startYear) * 12 + (dateInput.month - startMonth)
+
+            
+            #calender[index] = newSession
+            print(index)
             break
