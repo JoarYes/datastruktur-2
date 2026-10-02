@@ -38,7 +38,9 @@ def addMonthDateNodes(c, day, amount):
 
 def searchSession(target, currentNode):
     if currentNode.session == None:
+        print("Sessions for this date does not exist\n")
         return None
+    
     if target.day == currentNode.session.Date.day:
         if currentNode.node == None:
             return [currentNode.session]
@@ -83,10 +85,8 @@ def printSession(sessionList):
 
         print(f"\n{i+1}.\n" + "Date: " + str(session.Date.day) + "." + str(session.Date.month) + "." + str(session.Date.year))
         print("Length: " + str(session.length) + "km")
-
-        print()
-
         print("Duration: " + str(session.time.hour) + "h", str(session.time.minute) + "m", str(session.time.second) + "s")
+        print("Description: " + session.description + "\n")
 
 # Insert session into correct spot
 def addNode(aSession, prevNode):
@@ -130,6 +130,89 @@ def addNode(aSession, prevNode):
             return None
 
     return node
+
+def deleteSession(target, headNode):
+    if target == None or target == [None]:
+        return None
+    
+    result = searchSession(target[0].Date, headNode)
+
+    if result == None:
+        return None
+    else:
+        while True:
+            result = searchSession(target[0].Date, headNode)
+            printSession(result)
+            print("Press only enter to cancel command.")
+            usrInput = input("Which session do you want to delete?(number) ")
+
+            if usrInput == "":
+                return None
+            else:
+                try:
+                    usrInput = int(usrInput)
+                except:
+                    print("Invalid input!")
+                    continue
+
+                try:
+                    nodeDelete = sessionsList[usrInput - 1]
+                except:
+                    print("Session number does not exist!")
+                    continue
+
+                dSearchNode(nodeDelete, headNode, None)
+                break
+
+# Searches for the node that is to be deleted
+def dSearchNode(target, currentNode, prevNode):
+    if target == currentNode.session and prevNode == None:
+
+        # Creates variable with the pointer to replace head node
+        if currentNode.node != None:
+            replaceNode = Node(currentNode.node.session, currentNode.node.node)
+        else:
+            replaceNode = Node(None, None)
+
+        # Confirm deletion by user
+        while True:
+            cancel = input("Do you want to delete this session?(y/n) ")
+            if cancel == "y":
+                pass
+            elif cancel == "n":
+                return None
+            else:
+                print("Invalid input!")
+                continue
+            break
+
+        currentNode.session = replaceNode.session
+        currentNode.node = replaceNode.node
+        print("Session successfuly deleted.")
+        return None
+    elif target == currentNode.session:
+        if currentNode.node != None:
+            replaceNode = Node(currentNode.node.session, currentNode.node.node)
+        else:
+            replaceNode = None
+
+        # Confirm deletion by user
+        while True:
+            cancel = input("Do you want to delete this session?(y/n) ")
+            if cancel == "y":
+                pass
+            elif cancel == "n":
+                return None
+            else:
+                print("Invalid input!")
+                continue
+            break
+
+        prevNode.node = replaceNode
+
+    else:
+        dSearchNode(target, currentNode.node, currentNode)
+        
 
 offset = 0
 augustCheck = False
@@ -211,10 +294,11 @@ while True:
     if usrInput == "d":
         while True:
             try:
+                print("\nEnter an invalid input to choose whether to stop or continue current command.")
                 dateInput = datetime.strptime(input("What date(DD.MM.YYYY): "),"%d.%m.%Y").date()
             except:
                 print("Invalid input!\n")
-                continue
+                break
 
             if dateInput.year > 2035 or dateInput.year < 2026:
                 print("Year must be between 2026 and 2035!")
@@ -227,6 +311,9 @@ while True:
             index = (dateInput.year - startYear) * 12 + (dateInput.month - startMonth)
 
             sessionsList = searchSession(dateInput, calender[index])
+
+            deleteSession(sessionsList, calender[index])
+            break
 
     # List session(s)
     if usrInput == "l":
@@ -249,5 +336,9 @@ while True:
 
             sessionsList = searchSession(dateInput, calender[index])
 
-            printSession(sessionsList)
+            if sessionsList != None:
+                if sessionsList == [None]:
+                    break
+                printSession(sessionsList)
+
             break
