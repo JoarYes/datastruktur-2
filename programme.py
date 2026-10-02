@@ -37,7 +37,8 @@ def addMonthDateNodes(c, day, amount):
         return c.node
 
 def searchSession(target, currentNode):
-    print(currentNode.session.Date.day, target.day)
+    if currentNode.session == None:
+        return None
     if target.day == currentNode.session.Date.day:
         if currentNode.node == None:
             return [currentNode.session]
@@ -75,8 +76,17 @@ def searchSession(target, currentNode):
             print("Sessions for this date does not exist\n")
             return None
 
+# Prints sessions in a easy to read way
 def printSession(sessionList):
-    pass
+    for i in range(len(sessionList)):
+        session = sessionList[i]
+
+        print(f"\n{i+1}.\n" + "Date: " + str(session.Date.day) + "." + str(session.Date.month) + "." + str(session.Date.year))
+        print("Length: " + str(session.length) + "km")
+
+        print()
+
+        print("Duration: " + str(session.time.hour) + "h", str(session.time.minute) + "m", str(session.time.second) + "s")
 
 # Insert session into correct spot
 def addNode(aSession, prevNode):
@@ -139,15 +149,26 @@ while True:
 
     # Add session
     if usrInput == "a":
+        print("\nEnter an invalid input to choose whether to stop or continue current command.")
         while True:
             try:
                 dateInput = datetime.strptime(input("What date(DD.MM.YYYY): "),"%d.%m.%Y").date()
             except:
                 print("Invalid input!")
+
+                # Checks if the user wants to cancel current command
+                cancel = input("Cancel current command?(x): ")
+                if cancel == "x":
+                    break
                 continue
 
             if dateInput.year > 2035 or dateInput.year < 2026:
                 print("Year must be between 2026 and 2035!")
+
+                # Checks if the user wants to cancel current command
+                cancel = input("Cancel current command?(x): ")
+                if cancel == "x":
+                    break
                 continue
 
             descriptionInput = input("Description: ")
@@ -155,14 +176,24 @@ while True:
             try:
                 lengthInput = float(input("Length ran(km.m): "))
             except:
-                print("Invalid input!\nTry again!\n")
+                print("Invalid input!")
+
+                # Checks if the user wants to cancel current command
+                cancel = input("Cancel current command?(x): ")
+                if cancel == "x":
+                    break
                 continue
             
             durationInput = input("Duration(H.M.S): ").split(".")
             try:
-                duration = Duration(durationInput[0], durationInput[1], durationInput[2])
+                duration = Duration(int(durationInput[0]), int(durationInput[1]), int(durationInput[2]))
             except:
                 print("Invalid input!")
+
+                # Checks if the user wants to cancel current command
+                cancel = input("Cancel current command?(x): ")
+                if cancel == "x":
+                    break
                 continue
 
             newSession = Session(dateInput, descriptionInput, lengthInput, duration)
@@ -176,6 +207,26 @@ while True:
             addNode(newSession, calender[index])
             print("Session successfully added\n")
             break
+
+    if usrInput == "d":
+        while True:
+            try:
+                dateInput = datetime.strptime(input("What date(DD.MM.YYYY): "),"%d.%m.%Y").date()
+            except:
+                print("Invalid input!\n")
+                continue
+
+            if dateInput.year > 2035 or dateInput.year < 2026:
+                print("Year must be between 2026 and 2035!")
+                continue
+
+            startYear = 2026
+            startMonth = 1
+
+            # Calculate proper index
+            index = (dateInput.year - startYear) * 12 + (dateInput.month - startMonth)
+
+            sessionsList = searchSession(dateInput, calender[index])
 
     # List session(s)
     if usrInput == "l":
@@ -198,5 +249,5 @@ while True:
 
             sessionsList = searchSession(dateInput, calender[index])
 
-            print(sessionsList)
+            printSession(sessionsList)
             break
