@@ -51,11 +51,10 @@ def searchSession(target, currentNode):
                 for i in range(len(anotherSession)):
                     indexSession = anotherSession[i]
 
-                    currentList[i+1] = indexSession
-                return currentList
+                    currentList.append(indexSession)
 
-            sessionList = [currentNode.session, anotherSession]
-            return sessionList
+                currentList.append(currentNode.session)
+                return currentList
         return [currentNode.session]
     else:
         try:
@@ -65,17 +64,14 @@ def searchSession(target, currentNode):
                 currentList = []
 
                 for i in range(len(anotherSession)):
-                    print(i)
-                    print(anotherSession)
                     indexSession = anotherSession[i]
 
-                    currentList[i] = indexSession
+                    currentList.append(indexSession)
                 return currentList
 
             sessionList = [anotherSession]
             return sessionList
         except Exception as e:
-            print(f"\n {e} \n")
             print("Sessions for this date does not exist\n")
             return None
 
@@ -109,7 +105,7 @@ def addNode(aSession, prevNode):
             return None
         else:
             node = addNode(aSession, prevNode.node)
-            
+
     elif aSession.Date.day < prevNode.session.Date.day:
         pointer = Node(prevNode.session, prevNode.node)
         
@@ -178,7 +174,6 @@ while True:
             index = (dateInput.year - startYear) * 12 + (dateInput.month - startMonth)
 
             addNode(newSession, calender[index])
-            print(calender[index])
             print("Session successfully added\n")
             break
 
@@ -200,7 +195,7 @@ while True:
 
             # Calculate proper index
             index = (dateInput.year - startYear) * 12 + (dateInput.month - startMonth)
-            print(calender[index])
+
             sessionsList = searchSession(dateInput, calender[index])
 
             print(sessionsList)
