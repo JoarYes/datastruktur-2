@@ -36,18 +36,51 @@ def addMonthDateNodes(c, day, amount):
         c.node = Node(None, addMonthDateNodes(c, day, amount))
         return c.node
 
-def searchNode(target, prevNode):
-    if prevNode.session == None:
-        return "NaN"
-    if target <= prevNode.session.Date.day:
-        return prevNode
+def searchSession(target, currentNode):
+    print(currentNode.session.Date.day, target.day)
+    if target.day == currentNode.session.Date.day:
+        if currentNode.node == None:
+            return [currentNode.session]
+        elif target.day == currentNode.node.session.Date.day:
+            anotherSession = searchSession(target, currentNode.node)
+
+            # Used for searching more than 2 nodes
+            if type(anotherSession) == list:
+                currentList = []
+
+                for i in range(len(anotherSession)):
+                    indexSession = anotherSession[i]
+
+                    currentList[i+1] = indexSession
+                return currentList
+
+            sessionList = [currentNode.session, anotherSession]
+            return sessionList
+        return [currentNode.session]
     else:
         try:
-            node = searchNode(target, prevNode.node)
-        except:
+            anotherSession = searchSession(target, currentNode.node)
+
+            if type(anotherSession) == list:
+                currentList = []
+
+                for i in range(len(anotherSession)):
+                    print(i)
+                    print(anotherSession)
+                    indexSession = anotherSession[i]
+
+                    currentList[i] = indexSession
+                return currentList
+
+            sessionList = [anotherSession]
+            return sessionList
+        except Exception as e:
+            print(f"\n {e} \n")
+            print("Sessions for this date does not exist\n")
             return None
 
-    return node
+def printSession(sessionList):
+    pass
 
 # Insert session into correct spot
 def addNode(aSession, prevNode):
@@ -58,6 +91,14 @@ def addNode(aSession, prevNode):
         return None
 
     if prevNode.node == None:
+        if aSession.Date.day <= prevNode.session.Date.day:
+            pointer = Node(prevNode.session, prevNode.node)
+
+            prevNode.session = aSession
+            prevNode.node = pointer
+            
+            return None
+        
         prevNode.node = Node(aSession, pointer)
         return None
     
@@ -68,6 +109,14 @@ def addNode(aSession, prevNode):
             return None
         else:
             node = addNode(aSession, prevNode.node)
+            
+    elif aSession.Date.day < prevNode.session.Date.day:
+        pointer = Node(prevNode.session, prevNode.node)
+        
+        prevNode.session = aSession
+        prevNode.node = pointer
+        
+        return None
     else:
         try:
             node = addNode(aSession, prevNode.node)
@@ -129,6 +178,30 @@ while True:
             index = (dateInput.year - startYear) * 12 + (dateInput.month - startMonth)
 
             addNode(newSession, calender[index])
-
             print(calender[index])
+            print("Session successfully added\n")
+            break
+
+    # List session(s)
+    if usrInput == "l":
+        while True:
+            try:
+                dateInput = datetime.strptime(input("What date(DD.MM.YYYY): "),"%d.%m.%Y").date()
+            except:
+                print("Invalid input!\n")
+                continue
+
+            if dateInput.year > 2035 or dateInput.year < 2026:
+                print("Year must be between 2026 and 2035!")
+                continue
+
+            startYear = 2026
+            startMonth = 1
+
+            # Calculate proper index
+            index = (dateInput.year - startYear) * 12 + (dateInput.month - startMonth)
+            print(calender[index])
+            sessionsList = searchSession(dateInput, calender[index])
+
+            print(sessionsList)
             break
